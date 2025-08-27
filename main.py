@@ -62,12 +62,12 @@ app.mount("/media", StaticFiles(directory="media"), name="media")
 app.include_router(users.router)
 
 from sqladmin import Admin
-#from db.admin import UserAdmin, ProfileAdmin
+from db.admin import UserAdmin #, ProfileAdmin
 
 admin = Admin(app, engine)
 
 # Register admin models
-
+admin.add_view(UserAdmin)
 
 
 if __name__ == "__main__":
