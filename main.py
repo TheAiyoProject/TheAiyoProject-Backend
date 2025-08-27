@@ -54,9 +54,7 @@ media_path.mkdir(exist_ok=True)
 app.mount("/media", StaticFiles(directory="media"), name="media")
 
 
-# Tables are now managed by Alembic migrations
-# Use: alembic upgrade head to create/update database schema
-# Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 #app.include_router(home.router)
 app.include_router(users.router)
