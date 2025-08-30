@@ -54,7 +54,7 @@ class Profile(Base):
 
     id= Column(Integer, primary_key=True)
     user_id= Column(Integer, ForeignKey('users.id', ondelete="CASCADE"), unique=True, nullable=False)
-
+    nickname= Column(String(255), nullable=True)
     personalization_questions= Column(JSON, nullable=True)
 
 
