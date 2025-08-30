@@ -199,9 +199,8 @@ async def login(request: Request, data: LoginModel, db: Session = Depends(get_db
             "id": user.id,
             "email": user.email
         },
-        "streak": {
-            "current": profile.current_login_streak if profile else 1,
-            "max": profile.max_login_streak if profile else 1
+        "profile": {
+            "nickname": profile.nickname
         },
         "message": "Login successful"
     }

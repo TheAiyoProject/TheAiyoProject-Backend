@@ -60,12 +60,14 @@ Base.metadata.create_all(bind=engine)
 app.include_router(users.router)
 
 from sqladmin import Admin
-from db.admin import UserAdmin #, ProfileAdmin
+from db.admin import UserAdmin , ProfileAdmin, VerificationOTPAdmin
 
 admin = Admin(app, engine)
 
 # Register admin models
 admin.add_view(UserAdmin)
+admin.add_view(ProfileAdmin)
+admin.add_view(VerificationOTPAdmin)
 
 
 if __name__ == "__main__":
