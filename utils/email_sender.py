@@ -11,13 +11,13 @@ import argparse
 load_dotenv()
 
 # Email configuration
-SMTP_SERVER = os.getenv("EMAIL_HOST", "smtp.elasticemail.com")
-SMTP_PORT = int(os.getenv("EMAIL_PORT", "2525"))
+SMTP_SERVER = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+SMTP_PORT = int(os.getenv("EMAIL_PORT", "465"))
 SMTP_USERNAME = os.getenv("EMAIL_USER")
 SMTP_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
-# Use the authenticated username as sender (this is what Elastic Email allows)
-SENDER_EMAIL = SMTP_USERNAME
+# Use from email address (can be different from username for Gmail)
+SENDER_EMAIL = os.getenv("FROM_EMAIL", SMTP_USERNAME)
 
 def generate_otp(length=6):
     """Generate a random OTP of specified length"""
@@ -54,10 +54,16 @@ def send_email(to_email, subject, body):
         
         # Connect to SMTP server and send email
         print(f"Connecting to {SMTP_SERVER}:{SMTP_PORT}...")
-        smtp = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        
+        # Port 465 uses SSL directly, port 587 uses STARTTLS
+        if SMTP_PORT == 465:
+            smtp = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
+        else:
+            smtp = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+            smtp.starttls()
+        
         smtp.set_debuglevel(1)  # Enable verbose logging
         smtp.ehlo()
-        smtp.starttls()
         
         print(f"Logging in as {SMTP_USERNAME}...")
         smtp.login(SMTP_USERNAME, SMTP_PASSWORD)
