@@ -7,7 +7,7 @@ from utils.email_sender import  generate_otp, send_verification_email, send_pass
 from db.models import pwd_context
 from datetime import datetime, timedelta
 from sqlalchemy import desc
-from schemas.users import UserCreateModel, UserEmailUpdate, UserPasswordChange, LoginModel, EmailVerificationRequest, ResendVerificationRequest, PasswordResetRequest, PasswordResetVerification
+from schemas.users import UserCreateModel, UserEmailUpdate, UserPasswordChange, LoginModel, EmailVerificationRequest, ResendVerificationRequest, PasswordResetRequest, PasswordResetVerification, ProfileUpdate
 router = APIRouter(prefix="/api/auth")
 
 @router.post('/create-user')
@@ -213,8 +213,38 @@ async def logout(request: Request, current_user: User = Depends(get_current_user
 
 
 @router.patch("/profile/update")
+async def update_profile(
+    data: ProfileUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    my_profile = db.query(Profile).filter(Profile.user_id == current_user.id).first()
 
+    if not my_profile:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
 
+    # Update profile fields if provided in the request
+    if data.nickname is not None:
+        my_profile.nickname = data.nickname
+    
+    if data.personalization_questions is not None:
+        my_profile.personalization_questions = data.personalization_questions
+
+    try:
+        db.commit()
+        db.refresh(my_profile)
+        
+        return {
+            "message": "Profile updated successfully",
+            "profile": {
+                "id": my_profile.id,
+                "nickname": my_profile.nickname,
+                "personalization_questions": my_profile.personalization_questions
+            }
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.patch("/profile/update/user-email")
