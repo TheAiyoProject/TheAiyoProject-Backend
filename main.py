@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import users#, home
+from routers import users, home
 from db.models import Base,engine
 from utils.auth import SECRET_KEY
 from fastapi.middleware.cors import CORSMiddleware
@@ -56,7 +56,7 @@ app.mount("/media", StaticFiles(directory="media"), name="media")
 
 Base.metadata.create_all(bind=engine)
 
-#app.include_router(home.router)
+app.include_router(home.router)
 app.include_router(users.router)
 
 from sqladmin import Admin
