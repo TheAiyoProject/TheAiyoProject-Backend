@@ -4,6 +4,7 @@ from datetime import datetime
 from passlib.context import CryptContext
 from dotenv import load_dotenv
 import os
+import random
 load_dotenv()
 
 DATABASE_URL= os.environ['DATABASE_URL']
@@ -23,6 +24,27 @@ def get_db():
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
+def generate_platform_id():
+    """Return random 8–10 digit string"""
+    return str(random.randint(10**7, 10**10 - 1))
+
+"""
+
+def populate_platform_ids():
+    with SessionLocal() as db:  # context manager automatically closes session
+        users_without_pid = db.query(User).filter(User.platform_id == None).all()
+        print(f"Found {len(users_without_pid)} users without platform_id")
+
+        for user in users_without_pid:
+            new_id = generate_platform_id()
+            # optional uniqueness check:
+            while db.query(User).filter(User.platform_id == new_id).first():
+                new_id = generate_platform_id()
+            user.platform_id = new_id
+
+        db.commit()
+        print("Platform IDs assigned successfully!")
+"""
 class User(Base):
     __tablename__= 'users'
 
@@ -33,6 +55,7 @@ class User(Base):
     is_verified= Column(Boolean, default=False)
     is_active= Column(Boolean, default=True)
     is_admin= Column(Boolean, default=False)
+    platform_id = Column(String(10), unique=True, nullable=False, default=generate_platform_id)  # 👈
 
     # Relationship with Profile
     profile= relationship("Profile", uselist=False, back_populates="user", cascade="all, delete-orphan")
