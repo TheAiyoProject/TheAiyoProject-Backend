@@ -17,8 +17,13 @@ mongo_client = MongoClient(mongo_url)
 async def user_data_dashboard(current_user: User = Depends(get_current_user)):
     if not current_user.is_verified:
         return "Verify your account to access the dashboard"
-    my_platform_id= current_user.platform_id
+    my_platform_id= str(current_user.platform_id)
     print(my_platform_id)
     filter= {"client_id": my_platform_id}
     result = mongo_client['aiyo']['orders'].find(filter=filter)
-    return result
+
+    data = list(result)
+    for doc in data:
+        doc["_id"] = str(doc["_id"])  # Convert ObjectId to string for JSON compatibility
+    
+    return {"orders": data}
