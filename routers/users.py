@@ -326,6 +326,7 @@ async def get_profile(
             "email": current_user.email,
             "is_verified": current_user.is_verified,
             "is_admin": current_user.is_admin,
+            "platform_id": current_user.platform_id,
             "joined_at": current_user.joined_at
         },
         "profile": {
